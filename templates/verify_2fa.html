@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify 2FA</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Verify 2FA</h1>
+        <p>Please enter the code from your authentication app:</p>
+        <form method="POST" action="{{ url_for('auth.verify_2fa') }}">
+            <div class="form-group">
+                <label for="otp">Code:</label>
+                <input type="text" id="otp" name="otp" required>
+            </div>
+            <div style="text-align:center;">
+                <button type="submit">Verify</button>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>
