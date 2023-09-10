@@ -12,6 +12,11 @@ from models import User, db
 from extensions import bcrypt
 import pyotp
 from flask_login import login_user, logout_user, current_user, login_required
+from services.key_manager import (
+    generate_keys,
+    encrypt_private_key as encrypt_private_key_func,
+    decrypt_private_key,
+)
 import time
 
 auth_bp = Blueprint("auth", __name__)
@@ -30,11 +35,14 @@ def register():
             flash("Username is already taken. Please choose another one.")
             return render_template("register.html")
 
-        if enable_2fa:
-            secret_key = pyotp.random_base32()
-            print(secret_key)
-        else:
-            secret_key = None
+        # Generate a secret key
+        secret_key = pyotp.random_base32()
+
+        # Generate keys regardless of 2FA setting
+        public_key, private_key = generate_keys()
+        encrypted_private_key = encrypt_private_key_func(
+            private_key, password
+        )  # Rename the variable
 
         password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
 
@@ -43,13 +51,14 @@ def register():
             password_hash=password_hash,
             enable_2fa=enable_2fa,
             secret_key=secret_key,
+            public_key=public_key,
+            encrypted_private_key=encrypted_private_key,
         )
 
         db.session.add(new_user)
         db.session.commit()
-
         if enable_2fa:
-            flash("Please set up 2FA using the provided secret.")
+            flash("Please set up 2FA.")
             return redirect(url_for("auth.setup_2fa", secret_key=secret_key))
 
         return redirect(url_for("auth.login"))
@@ -81,7 +90,6 @@ def login():
         if session.get("login_attempts", 0) >= 3:
             if time.time() - session.get("last_attempt_time", 0) < 300:
                 return "Too many failed attempts. Please wait."
-
             session["login_attempts"] = 0
 
         username = request.form["username"]
@@ -90,15 +98,16 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user and bcrypt.check_password_hash(user.password_hash, password):
-            login_user(user)
-            session["login_attempts"] = 0
+            # If user has 2FA enabled
             if user.enable_2fa:
+                session["2fa_user_id"] = user.id
                 return redirect(url_for("auth.verify_2fa"))
+            # If user does not have 2FA enabled
             else:
+                login_user(user)
+                session["login_attempts"] = 0
                 flash("Login successful!", "success")
-                return redirect(
-                    url_for("keys.get_public_key")
-                )  # redirect to the get_public_key route after login
+                return redirect(url_for("keys.get_public_key"))
         else:
             session["login_attempts"] = session.get("login_attempts", 0) + 1
             session["last_attempt_time"] = time.time()
@@ -117,9 +126,17 @@ def verify_2fa():
     if request.method == "POST":
         user_input_otp = request.form.get("otp")
         if pyotp.TOTP(user.secret_key).verify(user_input_otp):
-            del session["2fa_user_id"]
-            session["user_id"] = user.id
+            login_user(user)  # Log the user in
+            del session["2fa_user_id"]  # Remove user ID from the session
             flash("Logged in successfully")
             return redirect("/")  # Redirect to the user dashboard or main page
         flash("Invalid OTP. Please try again")
     return render_template("verify_2fa.html")
+
+
+@auth_bp.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash("You've been logged out!", "success")
+    return redirect(url_for("auth.login"))

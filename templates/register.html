@@ -11,43 +11,44 @@
 </head>
 
 <body>
-    <div class="container h-100">
-        <div class="row justify-content-center align-items-center h-100">
-            <div class="col-md-6">
-                <h1 class="text-center mb-4">Registration</h1>
+    {% extends "base.html" %}
+    {% block content %}
+    <div class="row justify-content-center align-items-center h-100">
+        <div class="col-md-4">
+            <h1 class="text-center mb-4">Registration</h1>
 
-                <!-- Displaying Flashed Messages -->
-                {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                <ul class="flash-messages">
-                    {% for message in messages %}
-                    <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-                {% endwith %}
+            <!-- Displaying Flashed Messages -->
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul class="flash-messages">
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
 
-                <form method="POST" action="/auth/register" class="needs-validation" novalidate>
-                    <div class="form-group">
-                        <label for="username">Username:</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                        <div class="invalid-feedback">Please provide a username.</div>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password:</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                        <div class="invalid-feedback">Please provide a password.</div>
-                    </div>
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="enable_2fa" name="enable_2fa">
-                        <label for="enable_2fa" class="form-check-label">Enable 2FA</label>
-                    </div>
-                    <br>
-                    <button type="submit" class="btn btn-primary btn-block">Register</button>
-                </form>
-            </div>
+            <form method="POST" action="/auth/register" class="needs-validation" novalidate>
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                    <div class="invalid-feedback">Please provide a username.</div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                    <div class="invalid-feedback">Please provide a password.</div>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="enable_2fa" name="enable_2fa">
+                    <label for="enable_2fa" class="form-check-label">Enable 2FA</label>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
+            </form>
         </div>
     </div>
+    {% endblock %}
 </body>
 
 </html>

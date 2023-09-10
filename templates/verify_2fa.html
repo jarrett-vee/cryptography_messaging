@@ -3,25 +3,31 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify 2FA</title>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Verify 2FA</h1>
-        <p>Please enter the code from your authentication app:</p>
-        <form method="POST" action="{{ url_for('auth.verify_2fa') }}">
-            <div class="form-group">
-                <label for="otp">Code:</label>
-                <input type="text" id="otp" name="otp" required>
-            </div>
-            <div style="text-align:center;">
-                <button type="submit">Verify</button>
-            </div>
-        </form>
+    {% extends "base.html" %}
+    {% block content %}
+    <div class="row justify-content-center align-items-center h-100">
+        <div class="col-md-4">
+            <h1 class="text-center mb-4">Verify 2FA</h1>
+            <p class="text-center">Please enter the code from your authentication app:</p>
+            <form method="POST" action="{{ url_for('auth.verify_2fa') }}" class="needs-validation" novalidate>
+                <div class="form-group">
+                    <label for="otp">Enter the code from the app:</label>
+                    <input type="text" class="form-control" id="otp" name="otp" required>
+                    <div class="invalid-feedback">Please provide the OTP code.</div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Verify</button>
+            </form>
+        </div>
     </div>
+    {% endblock %}
 </body>
 
 </html>

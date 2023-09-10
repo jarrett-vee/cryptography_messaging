@@ -4,12 +4,12 @@ load_dotenv("setup.env")
 
 from flask import Flask
 from routes.keys import keys_bp
-
-
 from extensions import Config, bcrypt, db, login_manager
 from models import User
 from routes.auth import auth_bp
 from flask_migrate import Migrate
+from flask_login import login_required
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -24,6 +24,12 @@ migrate = Migrate(app, db)
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+@app.route("/")
+@login_required
+def dashboard():
+    return "Welcome to the dashboard."
 
 
 if __name__ == "__main__":

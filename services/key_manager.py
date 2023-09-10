@@ -1,5 +1,7 @@
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
+from Crypto.Random import get_random_bytes
+from Crypto.Util.Padding import pad, unpad
 
 
 def generate_keys():
@@ -10,12 +12,32 @@ def generate_keys():
 
 
 def encrypt_private_key(private_key, password):
-    cipher = PKCS1_OAEP.new(RSA.import_key(private_key))
-    encrypted_key = cipher.encrypt(password.encode())
-    return encrypted_key
+    salt = get_random_bytes(16)  # Generate a random salt
+    key = (
+        password.encode() + salt
+    )  # Combine password with salt to derive the encryption key
+
+    # Ensure the key is exactly 32 bytes (256 bits)
+    if len(key) < 32:
+        key = key + b"\x00" * (32 - len(key))
+    elif len(key) > 32:
+        key = key[:32]
+
+    cipher = AES.new(key, AES.MODE_CBC)  # Use the 32-byte key for AES encryption
+    encrypted_key = cipher.encrypt(pad(private_key, AES.block_size))
+    return salt + encrypted_key  # Prepend salt for decryption
 
 
 def decrypt_private_key(encrypted_key, password):
-    cipher = PKCS1_OAEP.new(RSA.import_key(encrypted_key))
-    decrypted_key = cipher.decrypt(password.encode())
+    salt = encrypted_key[:16]
+    key = password.encode() + salt
+
+    # Ensure the key is exactly 32 bytes (256 bits)
+    if len(key) < 32:
+        key = key + b"\x00" * (32 - len(key))
+    elif len(key) > 32:
+        key = key[:32]
+
+    cipher = AES.new(key, AES.MODE_CBC)
+    decrypted_key = unpad(cipher.decrypt(encrypted_key[16:]), AES.block_size)
     return decrypted_key

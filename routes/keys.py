@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from models import User
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 keys_bp = Blueprint("keys", __name__)
 
@@ -16,4 +16,6 @@ def get_public_key():
         else:
             flash("User not found!", "danger")
 
-    return render_template("get_public_key.html")
+    # Provide the current user's public key as a default without needing to search
+    default_public_key = current_user.public_key
+    return render_template("get_public_key.html", default_public_key=default_public_key)
