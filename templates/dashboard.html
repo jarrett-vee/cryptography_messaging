@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Welcome to the Dashboard</h2>
+
+<!-- Collapsible card for Public Key -->
+<div class="card mt-4">
+    <div class="card-header">
+        <a data-toggle="collapse" href="#publicKeyCard" role="button" aria-expanded="false"
+            aria-controls="publicKeyCard">
+            Your Public Key
+        </a>
+    </div>
+    <div id="publicKeyCard" class="collapse">
+        <div class="card-body">
+            <div class="alert alert-info" style="word-break: break-all;">
+                <strong>Public Key:</strong> {{ current_user.public_key }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Send Message Form -->
+<div class="message-form mt-4">
+    <h3>Send a Message</h3>
+    <form action="/messages/send" method="post">
+        <div class="form-group">
+            <input type="text" class="form-control" name="receiver_username" placeholder="Enter Receiver's Username"
+                required>
+        </div>
+        <div class="form-group">
+            <textarea class="form-control" name="encrypted_message" placeholder="Enter Encrypted Message"
+                required></textarea>
+        </div>
+        <div class="form-group">
+            <button type="submit">Send</button>
+        </div>
+    </form>
+</div>
+
+<!-- For Sent Messages -->
+<div class="sent-messages mt-4">
+    <h3>Sent Messages</h3>
+    <ul>
+        {% for msg in sent_messages %}
+        <li>
+            To: {{ msg.receiver.username }} - {{ msg.encrypted_message }}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- For Received Messages -->
+<div class="received-messages mt-4">
+    <h3>Received Messages</h3>
+    <ul>
+        {% for msg in received_messages %}
+        <li>
+            From: {{ msg.sender.username }} - {{ msg.encrypted_message }}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

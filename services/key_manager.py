@@ -1,7 +1,9 @@
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.Random import get_random_bytes
+from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Util.Padding import pad, unpad
+import base64
 
 
 def generate_keys():
@@ -12,32 +14,19 @@ def generate_keys():
 
 
 def encrypt_private_key(private_key, password):
-    salt = get_random_bytes(16)  # Generate a random salt
-    key = (
-        password.encode() + salt
-    )  # Combine password with salt to derive the encryption key
-
-    # Ensure the key is exactly 32 bytes (256 bits)
-    if len(key) < 32:
-        key = key + b"\x00" * (32 - len(key))
-    elif len(key) > 32:
-        key = key[:32]
-
-    cipher = AES.new(key, AES.MODE_CBC)  # Use the 32-byte key for AES encryption
+    salt = get_random_bytes(16)
+    derived_key = PBKDF2(password, salt, dkLen=32, count=1000000)
+    cipher = AES.new(derived_key, AES.MODE_CBC)
     encrypted_key = cipher.encrypt(pad(private_key, AES.block_size))
-    return salt + encrypted_key  # Prepend salt for decryption
+    encoded_encrypted_key = base64.b64encode(salt + cipher.iv + encrypted_key)
+    return encoded_encrypted_key
 
 
 def decrypt_private_key(encrypted_key, password):
-    salt = encrypted_key[:16]
-    key = password.encode() + salt
-
-    # Ensure the key is exactly 32 bytes (256 bits)
-    if len(key) < 32:
-        key = key + b"\x00" * (32 - len(key))
-    elif len(key) > 32:
-        key = key[:32]
-
-    cipher = AES.new(key, AES.MODE_CBC)
-    decrypted_key = unpad(cipher.decrypt(encrypted_key[16:]), AES.block_size)
+    encrypted_key_binary = base64.b64decode(encrypted_key)
+    salt = encrypted_key_binary[:16]
+    iv = encrypted_key_binary[16:32]
+    derived_key = PBKDF2(password, salt, dkLen=32, count=1000000)
+    cipher = AES.new(derived_key, AES.MODE_CBC, iv)
+    decrypted_key = unpad(cipher.decrypt(encrypted_key_binary[32:]), AES.block_size)
     return decrypted_key
