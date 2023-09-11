@@ -1,7 +1,3 @@
-from dotenv import load_dotenv
-
-load_dotenv("setup.env")
-
 from flask import Flask, render_template
 from flask_cors import CORS
 from routes.keys import keys_bp
@@ -15,7 +11,6 @@ from routes.messages import messages_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config["JSONIFY_PRETTYPRINT_REGULAR"] = False
 CORS(app)
 db.init_app(app)
 login_manager.init_app(app)
