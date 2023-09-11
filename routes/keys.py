@@ -16,6 +16,5 @@ def get_public_key():
         else:
             flash("User not found!", "danger")
 
-    # Provide the current user's public key as a default without needing to search
     default_public_key = current_user.public_key
     return render_template("get_public_key.html", default_public_key=default_public_key)

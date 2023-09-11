@@ -22,7 +22,7 @@ def send_message():
     message = Message(
         sender_id=current_user.id,
         receiver_id=receiver.id,
-        encrypted_message=encrypted_message_bytes,  # Use the bytes version
+        encrypted_message=encrypted_message_bytes,
     )
 
     db.session.add(message)

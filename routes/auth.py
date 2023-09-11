@@ -10,7 +10,6 @@ from flask import (
 )
 from models import User, db
 from config import bcrypt
-from Crypto.PublicKey import RSA
 import base64
 import pyotp
 from flask_login import login_user, logout_user, current_user, login_required
@@ -31,19 +30,15 @@ def register():
         password = request.form["password"]
         enable_2fa = request.form.get("enable_2fa") == "on"
 
-        # Check if the username already exists
         user = User.query.filter_by(username=username).first()
         if user:
             flash("Username is already taken. Please choose another one.")
             return render_template("register.html")
 
-        # Generate a secret key
         secret_key = pyotp.random_base32()
 
-        # Generate keys regardless of 2FA setting
         public_key, private_key = generate_keys()
 
-        # Encode the binary public key as a base64 string before saving it to the database
         public_key_string = base64.b64encode(public_key).decode()
 
         encrypted_private_key = encrypt_private_key_func(private_key, password)
@@ -55,7 +50,7 @@ def register():
             password_hash=password_hash,
             enable_2fa=enable_2fa,
             secret_key=secret_key,
-            public_key=public_key_string,  # Save the base64 encoded string
+            public_key=public_key_string,
             encrypted_private_key=encrypted_private_key,
         )
 
@@ -102,11 +97,9 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user and bcrypt.check_password_hash(user.password_hash, password):
-            # If user has 2FA enabled
             if user.enable_2fa:
                 session["2fa_user_id"] = user.id
                 return redirect(url_for("auth.verify_2fa"))
-            # If user does not have 2FA enabled
             else:
                 login_user(user)
                 session["login_attempts"] = 0
@@ -130,8 +123,8 @@ def verify_2fa():
     if request.method == "POST":
         user_input_otp = request.form.get("otp")
         if pyotp.TOTP(user.secret_key).verify(user_input_otp):
-            login_user(user)  # Log the user in
-            del session["2fa_user_id"]  # Remove user ID from the session
+            login_user(user)
+            del session["2fa_user_id"]
             flash("Logged in successfully")
             return redirect(url_for("dashboard"))
         flash("Invalid OTP. Please try again")

@@ -19,7 +19,6 @@ function sendMessage(receiverUsername, encryptedMessage) {
         })
         .then(data => {
             console.log("Parsed response data:", data);
-            // You can handle the parsed data here...
         })
         .catch(error => {
             console.error("Error occurred:", error);

@@ -3,7 +3,6 @@
 {% block content %}
 <h2>Welcome to the Dashboard</h2>
 
-<!-- Collapsible card for Public Key -->
 <div class="card mt-4">
     <div class="card-header">
         <a data-toggle="collapse" href="#publicKeyCard" role="button" aria-expanded="false"
@@ -20,7 +19,6 @@
     </div>
 </div>
 
-<!-- Send Message Form -->
 <div class="message-form mt-4">
     <h3>Send a Message</h3>
     <form action="/messages/send" method="post">
@@ -38,7 +36,6 @@
     </form>
 </div>
 
-<!-- For Sent Messages -->
 <div class="sent-messages mt-4">
     <h3>Sent Messages</h3>
     <ul>
@@ -50,7 +47,6 @@
     </ul>
 </div>
 
-<!-- For Received Messages -->
 <div class="received-messages mt-4">
     <h3>Received Messages</h3>
     <ul>

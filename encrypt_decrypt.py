@@ -57,19 +57,6 @@ def main():
                 you.encrypted_private_key, password
             )
 
-            # Check if decryption was successful
-            if (
-                isinstance(decrypted_private_key, bytes)
-                and b"-----BEGIN RSA PRIVATE KEY-----" in decrypted_private_key
-            ):
-                print("Decryption seems to be successful!")
-            else:
-                print("Decryption didn't result in the expected PEM format.")
-                return
-
-            # Print the decrypted private key for visual inspection (ensure you only do this in a safe environment)
-            print(decrypted_private_key.decode("utf-8"))
-
             encrypted_msg = input("Enter the encrypted message: ").strip()
             decrypted_msg = decrypt_message(encrypted_msg, decrypted_private_key)
             print(f"Decrypted Message: {decrypted_msg}")

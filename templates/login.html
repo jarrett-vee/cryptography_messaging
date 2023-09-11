@@ -55,9 +55,9 @@
                     dataType: "json",
                     success: function (response) {
                         if (response.success) {
-                            window.location.href = response.redirect_url;  // Redirect on success
+                            window.location.href = response.redirect_url;
                         } else {
-                            alert(response.error_message);  // Show error message on failure
+                            alert(response.error_message);
                         }
                     }
                 });
