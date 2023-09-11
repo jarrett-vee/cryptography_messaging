@@ -74,7 +74,7 @@ def setup_2fa(secret_key):
             return redirect(url_for("auth.login"))
         flash("Invalid OTP. Please try again")
     otp_uri = pyotp.totp.TOTP(secret_key).provisioning_uri(
-        name="ChatBot", issuer_name="ChatBotInc."
+        name="Messaging", issuer_name="Messaging_App"
     )
 
     return render_template("setup_2fa.html", otp_uri=otp_uri)
