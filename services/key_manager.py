@@ -1,8 +1,7 @@
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
 from Crypto.Protocol.KDF import PBKDF2
-from Crypto.Util.Padding import pad, unpad
+from Crypto.Util.Padding import unpad
 import base64
 
 
@@ -11,15 +10,6 @@ def generate_keys():
     private_key = key.export_key()
     public_key = key.public_key().export_key()
     return public_key, private_key
-
-
-def encrypt_private_key(private_key, password):
-    salt = get_random_bytes(16)
-    derived_key = PBKDF2(password, salt, dkLen=32, count=1000000)
-    cipher = AES.new(derived_key, AES.MODE_CBC)
-    encrypted_key = cipher.encrypt(pad(private_key, AES.block_size))
-    encoded_encrypted_key = base64.b64encode(salt + cipher.iv + encrypted_key)
-    return encoded_encrypted_key
 
 
 def decrypt_private_key(encrypted_key, password):
