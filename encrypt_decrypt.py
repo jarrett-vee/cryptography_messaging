@@ -6,7 +6,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from models import User
 from app import app
-from services.key_manager import decrypt_private_key, encrypt_private_key
+from services.key_manager import decrypt_private_key
 
 
 def encrypt_message(public_key, message):
