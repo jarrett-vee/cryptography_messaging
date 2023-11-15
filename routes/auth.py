@@ -13,10 +13,7 @@ from config import bcrypt
 import base64
 import pyotp
 from flask_login import login_user, logout_user, current_user, login_required
-from services.key_manager import (
-    generate_keys,
-    encrypt_private_key as encrypt_private_key_func,
-)
+from services.key_manager import generate_keys, encrypt_private_key
 
 import time
 
@@ -41,7 +38,7 @@ def register():
 
         public_key_string = base64.b64encode(public_key).decode()
 
-        encrypted_private_key = encrypt_private_key_func(private_key, password)
+        encrypted_private_key = encrypt_private_key(private_key, password)
 
         password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
 
